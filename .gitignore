@@ -1,0 +1,36 @@
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor files and directories (add specific ones as needed)
+.idea/
+.vscode/
+*.suo
+*.user
+*.config.user
+*.component.cache
+
+# Build artifacts, temporary files, and compiled code
+/build/
+/dist/
+/target/
+*.log
+*.temp
+*.tmp
+*.pyc  # For Python
+__pycache__/ # For Python
+*.class # For Java
+/bin/ # For .NET/C#
+/obj/ # For .NET/C#
+
+# Dependencies (language specific examples)
+/node_modules/ # For Node.js/JavaScript
+/venv/ # For Python virtual environments
+/vendor/ # For PHP/Composer
+
+# Configuration/Environment files (often sensitive)
+.env
+.flaskenv
+config.json
+credentials.json
+node_modules
