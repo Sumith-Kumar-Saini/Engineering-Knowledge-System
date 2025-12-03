@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "jest",
+    "clean": "rimraf -g \"packages/**/node_modules\" \"packages/**/dist\"",
+    "clean:root": "rimraf node_modules dist",
     "build": "pnpm -r build",
     "test:watch": "jest --watch",
     "test:utils": "jest packages/utils"
@@ -17,6 +19,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "jest": "^30.2.0",
+    "rimraf": "^6.1.2",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
