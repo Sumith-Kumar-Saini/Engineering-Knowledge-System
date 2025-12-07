@@ -1,53 +1,73 @@
-type ExtractedFnc = (idx?: number | undefined) => [string | null, number];
+type TokenType =
+  | "{"
+  | "}"
+  | "["
+  | "]"
+  | ":"
+  | ","
+  | "STRING"
+  | "NUMBER"
+  | "TRUE"
+  | "FALSE"
+  | "NULL"
+  | "EOF";
 
-// -- White spaces " ", "\t", "\n", "\r", "\v", "\f", "\b"
-const WHITESPACE = [32, 9, 10, 13, 11, 12, 8];
-
-const TOKENS = {
-  LeftCurlyBrace: 123,
-  RightCurlyBrace: 125,
-  LeftSquareBracket: 91,
-  RightSquareBracket: 93,
-  Colon: 44,
-  Comma: 34,
-};
-
-function safeParse(rawInput: string) {
-  const input = rawInput.trim();
-  if (!input) return "";
-  const extStr = extractString(input);
-  for (let i = 0; i < input.length; i++) {
-    const currentStr = extStr();
-  }
+interface Token {
+  type: TokenType;
+  value?: string | number | null; // for STRING and NUMBER and maybe literals
+  index: number; // starting index in source (useful for errors)
+  length: number; // length of text consumed
 }
 
-function parseObject(inputFnc: ExtractedFnc, index: number) {}
+const WhiteSpace = [];
+(() => {
+  [32, 9, 10, 13, 11, 12, 8].forEach((val) => (WhiteSpace[val] = true));
+})();
 
-function extractString(str: string): ExtractedFnc {
+function tokenize(input: string): Token[] {
   let index = 0;
-  return (idx?: number) =>
-    idx ? [str.charAt(idx) || null, idx] : [str.charAt(index) || null, index++];
 }
 
-function Literals(inputFnc: ExtractedFnc, index: number) {
-  const [currentStr] = inputFnc(index);
-  if (currentStr === null) return null;
-  if (currentStr === '"') return "string";
-  if (isNumber(currentStr)) return "number";
-  if (currentStr === "t" || currentStr === "f") return "boolean"; // it needs to run a function which check the boolean value
+function readString(input: string, idx: number): Token {
+  const start = idx;
+  idx++;
+  let out = "";
+  while (idx < input.length) {
+    const ch = input[idx++];
+    if (ch === '"')
+      return { type: "STRING", value: out, index: start, length: idx - start };
+    if (ch === "\\") idx += 2;
+    else out += ch;
+  }
+  throw new Error(`Unterminated string at index ${start}`);
 }
 
-// testing new things to build this function
-// function Literals(inputFnc: ExtractedFnc, index: number) {
-//   const [currentStr] = inputFnc(index);
-//   if (currentStr === null) return null;
-//   if (currentStr === '"') return "string";
-//   if (isNumber(currentStr)) return "number";
-//   if (currentStr === "t" || currentStr === "f") return "boolean"; // it needs to run a function which check the boolean value
-// }
-
-function isNumber(str: string) {
-  if (str.length === 0) return false;
-  const firstChar = str.charAt(0);
-  return !isNaN(parseInt(firstChar));
+function readNumber(input: string, idx: number): Token {
+  const start = idx;
+  if (input[idx] === "-") idx++;
+  if (input[idx] === "0") {
+    idx++;
+  } else {
+    if (!isDigit1to9(input[idx])) throw Error("...");
+    while (isDigit(input[idx])) idx++;
+  }
+  if (input[idx] === ".") {
+    idx++;
+    if (!isDigit(input[idx])) throw Error("...");
+    while (isDigit(input[idx])) idx++;
+  }
+  if (input[idx] === "e" || input[idx] === "E") {
+    idx++;
+    if (input[idx] === "+" || input[idx] === "-") idx++;
+    if (!isDigit(input[idx])) throw error;
+    while (isDigit(input[idx])) idx++;
+  }
+  const raw = input.substring(start, idx);
+  return {
+    type: "NUMBER",
+    value: Number(raw),
+    index: start,
+    length: idx - start,
+  };
 }
+
